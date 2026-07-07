@@ -75,6 +75,15 @@ export function Options() {
               onChange={(v) => update({ editorTheme: v })}
             />
           </Row>
+          <Row label="Word wrap">
+            <Toggle
+              checked={settings.wordWrap}
+              onChange={(v) => update({ wordWrap: v })}
+            />
+          </Row>
+          <Row label="Minimap">
+            <Toggle checked={settings.minimap} onChange={(v) => update({ minimap: v })} />
+          </Row>
           <Row label="Auto-save code & notes">
             <Toggle
               checked={settings.autoSave}

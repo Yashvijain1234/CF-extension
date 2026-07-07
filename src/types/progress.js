@@ -3,7 +3,13 @@
 /** Saved code per language for a given problem. */
 
 export const defaultProblemData = () => ({
-  progress: { status: 'none', favorite: false, starred: false, updatedAt: Date.now() },
+  progress: {
+    status: 'none',
+    favorite: false,
+    starred: false,
+    needsPractice: false,
+    updatedAt: Date.now(),
+  },
   notes: { content: '', updatedAt: Date.now() },
   code: {},
   lastLanguage: null,

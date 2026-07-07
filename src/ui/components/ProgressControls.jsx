@@ -1,6 +1,7 @@
+import { CheckCircle2, RotateCcw, Circle, Heart, Star, Target } from 'lucide-react';
 import { IconButton } from './common';
 
-/** Solved / Revision / Favorite / Starred toggles. */
+/** Solved / Revision / Favorite / Starred / Needs-Practice toggles. */
 export function ProgressControls({ progress, onChange }) {
   const cycleStatus = () => {
     const order = ['none', 'solved', 'revision'];
@@ -8,12 +9,12 @@ export function ProgressControls({ progress, onChange }) {
     onChange({ status: next });
   };
 
-  const statusLabel =
+  const status =
     progress.status === 'solved'
-      ? '✅ Solved'
+      ? { label: 'Solved', Icon: CheckCircle2, cls: 'text-emerald-500' }
       : progress.status === 'revision'
-        ? '🔁 Revision'
-        : '⬜ Mark';
+        ? { label: 'Revision', Icon: RotateCcw, cls: 'text-amber-500' }
+        : { label: 'Mark', Icon: Circle, cls: 'text-cf-muted' };
 
   return (
     <div className="flex items-center gap-1.5">
@@ -21,23 +22,31 @@ export function ProgressControls({ progress, onChange }) {
         type="button"
         onClick={cycleStatus}
         title="Cycle solved status"
-        className="rounded-md border border-cf-border px-2.5 py-1 text-xs font-medium text-cf-text transition hover:bg-cf-surface-2"
+        className={`inline-flex items-center gap-1.5 rounded-md border border-cf-border px-2.5 py-1 text-xs font-medium transition hover:bg-cf-surface-2 ${status.cls}`}
       >
-        {statusLabel}
+        <status.Icon size={14} />
+        {status.label}
       </button>
       <IconButton
         title="Favorite"
         active={progress.favorite}
         onClick={() => onChange({ favorite: !progress.favorite })}
       >
-        {progress.favorite ? '❤️' : '🤍'}
+        <Heart size={15} fill={progress.favorite ? 'currentColor' : 'none'} />
       </IconButton>
       <IconButton
         title="Star"
         active={progress.starred}
         onClick={() => onChange({ starred: !progress.starred })}
       >
-        {progress.starred ? '⭐' : '☆'}
+        <Star size={15} fill={progress.starred ? 'currentColor' : 'none'} />
+      </IconButton>
+      <IconButton
+        title="Needs practice"
+        active={progress.needsPractice}
+        onClick={() => onChange({ needsPractice: !progress.needsPractice })}
+      >
+        <Target size={15} />
       </IconButton>
     </div>
   );

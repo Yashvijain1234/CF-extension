@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { LANGUAGES } from '@/api/languages';
-import { isLoggedIn, pollVerdict, submitSolution } from '@/services/pageBridge';
+import { isLoggedIn, pollVerdict, submitViaPage } from '@/services/pageBridge';
 
 /**
  * Drives the submit → poll → verdict flow entirely from the content-script
@@ -34,16 +34,22 @@ export function useSubmission(problem) {
         return s;
       }
 
-      setState({ phase: 'submitting' });
       const since = Math.floor(Date.now() / 1000);
+      const payload = {
+        contestId: problem.contestId,
+        problemIndex: problem.problemIndex,
+        languageId: LANGUAGES[language].cfId,
+        source,
+        isGym: problem.url.includes('/gym/'),
+      };
       try {
-        const outcome = await submitSolution({
-          contestId: problem.contestId,
-          problemIndex: problem.problemIndex,
-          languageId: LANGUAGES[language].cfId,
-          source,
-          isGym: problem.url.includes('/gym/'),
-        });
+        // Open the real Codeforces submit page with the code + problem
+        // pre-filled so the user can complete the submission there (this also
+        // clears any anti-bot Turnstile challenge, which a background POST
+        // cannot solve).
+        setState({ phase: 'verifying' });
+        const outcome = await submitViaPage(payload);
+
         if (!outcome.queued) {
           const s = {
             phase: 'error',
@@ -57,6 +63,7 @@ export function useSubmission(problem) {
         const result = await pollVerdict({
           contestId: problem.contestId,
           problemIndex: problem.problemIndex,
+          submissionId: outcome.submissionId,
           since,
           onUpdate: (partial) => setState({ phase: 'polling', result: partial }),
         });

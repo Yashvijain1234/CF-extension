@@ -6,13 +6,18 @@
 
 import {
   fetchProblemSubmissions,
+  getCurrentHandle,
   isLoggedIn,
   pollVerdict,
+  runCustomTest,
   submitSolution,
+  submitViaPage,
 } from '@/services/codeforces';
 
 function isFromOverlay(event) {
-  return typeof event.origin === 'string' && event.origin.startsWith('chrome-extension://');
+  return (
+    typeof event.origin === 'string' && event.origin.startsWith('chrome-extension://')
+  );
 }
 
 function reply(event, payload) {
@@ -31,9 +36,32 @@ export function installBridge(onClose) {
         reply(event, { type: 'CF_RESPONSE', id: msg.id, ok: true, data: isLoggedIn() });
         break;
 
+      case 'CF_GET_HANDLE':
+        reply(event, {
+          type: 'CF_RESPONSE',
+          id: msg.id,
+          ok: true,
+          data: getCurrentHandle(),
+        });
+        break;
+
       case 'CF_SUBMIT':
         try {
           const data = await submitSolution(msg.payload);
+          reply(event, { type: 'CF_RESPONSE', id: msg.id, ok: true, data });
+        } catch (err) {
+          reply(event, {
+            type: 'CF_RESPONSE',
+            id: msg.id,
+            ok: false,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+        break;
+
+      case 'CF_SUBMIT_VIA_PAGE':
+        try {
+          const data = await submitViaPage(msg.payload);
           reply(event, { type: 'CF_RESPONSE', id: msg.id, ok: true, data });
         } catch (err) {
           reply(event, {
@@ -52,6 +80,28 @@ export function installBridge(onClose) {
             onUpdate: (result) => {
               event.source?.postMessage(
                 { type: 'CF_POLL_UPDATE', id: msg.id, result },
+                event.origin,
+              );
+            },
+          });
+          reply(event, { type: 'CF_RESPONSE', id: msg.id, ok: true, data });
+        } catch (err) {
+          reply(event, {
+            type: 'CF_RESPONSE',
+            id: msg.id,
+            ok: false,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+        break;
+
+      case 'CF_RUN':
+        try {
+          const data = await runCustomTest({
+            ...msg.payload,
+            onUpdate: (update) => {
+              event.source?.postMessage(
+                { type: 'CF_RUN_UPDATE', id: msg.id, update },
                 event.origin,
               );
             },

@@ -19,7 +19,12 @@
   --cf-accent-hover: #1d4ed8;
 
   color: var(--cf-text);
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   line-height: 1.6;
 }
 

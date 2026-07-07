@@ -8,6 +8,8 @@ export const DEFAULT_SETTINGS = {
   autoSave: true,
   animations: true,
   timerAutoStart: true,
+  wordWrap: false,
+  minimap: false,
   github: {
     connected: false,
     token: null,

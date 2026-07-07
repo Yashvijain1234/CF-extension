@@ -78,7 +78,9 @@ export function cleanSectionHtml(node) {
   normalizeImages(clone);
   stripNoise(clone);
   const html = normalizeUnicodeMath(
-    clone.innerHTML.replace(/\$\$\$([\s\S]+?)\$\$\$/g, (_m, tex) => `\\(${tex}\\)`).trim(),
+    clone.innerHTML
+      .replace(/\$\$\$([\s\S]+?)\$\$\$/g, (_m, tex) => `\\(${tex}\\)`)
+      .trim(),
   );
   return html;
 }

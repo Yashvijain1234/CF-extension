@@ -22,6 +22,11 @@ function postToPage(type, payload, { onPollUpdate } = {}) {
         return;
       }
 
+      if (msg.type === 'CF_RUN_UPDATE') {
+        onPollUpdate?.(msg.update);
+        return;
+      }
+
       if (msg.type === 'CF_RESPONSE') {
         window.removeEventListener('message', onMessage);
         if (msg.ok) resolve(msg.data);
@@ -38,8 +43,16 @@ export function isLoggedIn() {
   return postToPage('CF_IS_LOGGED_IN');
 }
 
+export function getHandle() {
+  return postToPage('CF_GET_HANDLE');
+}
+
 export function submitSolution(payload) {
   return postToPage('CF_SUBMIT', payload);
+}
+
+export function submitViaPage(payload) {
+  return postToPage('CF_SUBMIT_VIA_PAGE', payload);
 }
 
 export function pollVerdict(opts) {
@@ -49,6 +62,11 @@ export function pollVerdict(opts) {
 
 export function fetchProblemSubmissions(contestId, problemIndex) {
   return postToPage('CF_FETCH_SUBMISSIONS', { contestId, problemIndex });
+}
+
+export function runCustomTest(opts) {
+  const { onUpdate, ...payload } = opts;
+  return postToPage('CF_RUN', payload, { onPollUpdate: onUpdate });
 }
 
 export function closeOverlay() {

@@ -5,7 +5,7 @@ export default {
   // host Codeforces page. A scoped reset lives in `src/styles/global.css`
   // under `.cf-leetmode-root` instead.
   corePlugins: { preflight: false },
-  content: ['./src/**/*.{ts,tsx,html}'],
+  content: ['./src/**/*.{js,jsx,ts,tsx,html}'],
   theme: {
     extend: {
       colors: {

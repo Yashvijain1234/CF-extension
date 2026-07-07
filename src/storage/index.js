@@ -8,7 +8,28 @@
 import { DEFAULT_SETTINGS, defaultProblemData } from '@/types';
 
 const SETTINGS_KEY = 'cf_leetmode_settings';
+const LAYOUT_KEY = 'cf_leetmode_layout';
 const problemKey = (key) => `cf_problem_${key}`;
+
+/** Default resizable-panel sizes (percentages). */
+const DEFAULT_LAYOUT = {
+  /** Width of the left (problem) pane as a % of the body. */
+  leftWidth: 46,
+  /** Height of the bottom (tests/console) pane as a % of the right column. */
+  bottomHeight: 34,
+};
+
+export async function getLayout() {
+  const result = await chrome.storage.local.get(LAYOUT_KEY);
+  return { ...DEFAULT_LAYOUT, ...(result[LAYOUT_KEY] ?? {}) };
+}
+
+export async function saveLayout(patch) {
+  const current = await getLayout();
+  const next = { ...current, ...patch };
+  await chrome.storage.local.set({ [LAYOUT_KEY]: next });
+  return next;
+}
 
 /** Deep-merge helper so newly added settings fields fall back to defaults. */
 function mergeSettings(stored) {
