@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Theme tokens. The overlay root gets `.cf-lm-light` or `.cf-lm-dark`, letting
+ * every component reference the same CSS variables regardless of Codeforces'
+ * own theme. Everything is scoped under `.cf-leetmode-root` so nothing leaks
+ * into the host page.
+ */
+.cf-leetmode-root {
+  --cf-bg: #ffffff;
+  --cf-surface: #f7f8fa;
+  --cf-surface-2: #eef0f3;
+  --cf-border: #e2e5ea;
+  --cf-text: #1a1a1e;
+  --cf-muted: #6b7280;
+  --cf-accent: #2563eb;
+  --cf-accent-hover: #1d4ed8;
+
+  color: var(--cf-text);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+.cf-leetmode-root.cf-lm-dark {
+  --cf-bg: #0e1116;
+  --cf-surface: #161b22;
+  --cf-surface-2: #1f2630;
+  --cf-border: #2a313c;
+  --cf-text: #e6edf3;
+  --cf-muted: #8b949e;
+  --cf-accent: #3b82f6;
+  --cf-accent-hover: #60a5fa;
+}
+
+.cf-leetmode-root *,
+.cf-leetmode-root *::before,
+.cf-leetmode-root *::after {
+  box-sizing: border-box;
+}
+
+/* Scoped reset (replaces Tailwind preflight so nothing leaks to the host). */
+.cf-leetmode-root button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.cf-leetmode-root h1,
+.cf-leetmode-root h2,
+.cf-leetmode-root h3,
+.cf-leetmode-root p,
+.cf-leetmode-root pre {
+  margin: 0;
+}
+.cf-leetmode-root input,
+.cf-leetmode-root textarea,
+.cf-leetmode-root select {
+  font: inherit;
+  color: inherit;
+}
+.cf-leetmode-root a {
+  text-decoration: none;
+}
+.cf-leetmode-root h1 {
+  font-size: 1.25rem;
+}
+
+/* Rich statement typography ---------------------------------------------- */
+.cf-statement {
+  color: var(--cf-text);
+  font-size: 15px;
+}
+.cf-statement p {
+  margin: 0 0 0.85em;
+}
+.cf-statement ul,
+.cf-statement ol {
+  margin: 0 0 0.85em 1.4em;
+  list-style: revert;
+}
+.cf-statement li {
+  margin-bottom: 0.35em;
+}
+.cf-statement img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.6em 0;
+  background: #fff;
+}
+.cf-statement pre {
+  background: var(--cf-surface-2);
+  padding: 0.75em 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.cf-statement b,
+.cf-statement strong {
+  font-weight: 600;
+}
+.cf-statement a {
+  color: var(--cf-accent);
+  text-decoration: underline;
+}
+
+/* Floating "Open in Better UI" button ----------------------------------- */
+.cf-lm-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.cf-lm-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+}
+.cf-lm-fab.cf-lm-fab-dark {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+
+/* Thin scrollbars inside the overlay ------------------------------------ */
+.cf-leetmode-root ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.cf-leetmode-root ::-webkit-scrollbar-thumb {
+  background: var(--cf-border);
+  border-radius: 6px;
+}
+.cf-leetmode-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
