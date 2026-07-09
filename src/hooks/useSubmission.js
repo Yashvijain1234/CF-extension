@@ -1,11 +1,21 @@
 import { useCallback, useState } from 'react';
 import { LANGUAGES } from '@/api/languages';
-import { isLoggedIn, pollVerdict, submitViaPage } from '@/services/pageBridge';
+import { isLoggedIn, pollVerdict } from '@/services/pageBridge';
+import { nativeSubmit } from '@/services/nativeSubmit';
 
 /**
- * Drives the submit → poll → verdict flow entirely from the content-script
- * context (reusing the logged-in Codeforces session), and reports the final
- * result to the caller (used to trigger the GitHub push prompt).
+ * Drives the full submit → poll → verdict flow:
+ *
+ *   1. The background worker opens (or reuses) the real Codeforces submit tab,
+ *      injects the code + language into the native form (CodeMirror / Ace /
+ *      textarea), clicks the official Submit button and confirms the new
+ *      submission id via the CF API. Progress streams back live.
+ *   2. Verdict polling then runs in the content script (same-origin, reusing
+ *      the logged-in session) until the judge reaches a terminal verdict.
+ *
+ * State shape: { phase, message?, result?, error? } where phase is one of
+ * 'idle' | 'submitting' | 'polling' | 'done' | 'error'. `message` carries the
+ * human-readable progress text for the loading indicator.
  */
 export function useSubmission(problem) {
   const [state, setState] = useState({ phase: 'idle' });
@@ -20,7 +30,7 @@ export function useSubmission(problem) {
         setState(s);
         return s;
       }
-      if (!isLoggedIn()) {
+      if (!(await isLoggedIn().catch(() => false))) {
         const s = {
           phase: 'error',
           error: 'You are not logged in to Codeforces.',
@@ -35,31 +45,25 @@ export function useSubmission(problem) {
       }
 
       const since = Math.floor(Date.now() / 1000);
-      const payload = {
-        contestId: problem.contestId,
-        problemIndex: problem.problemIndex,
-        languageId: LANGUAGES[language].cfId,
-        source,
-        isGym: problem.url.includes('/gym/'),
-      };
       try {
-        // Open the real Codeforces submit page with the code + problem
-        // pre-filled so the user can complete the submission there (this also
-        // clears any anti-bot Turnstile challenge, which a background POST
-        // cannot solve).
-        setState({ phase: 'verifying' });
-        const outcome = await submitViaPage(payload);
+        setState({
+          phase: 'submitting',
+          message: 'Preparing your submission…',
+        });
+        const outcome = await nativeSubmit(
+          {
+            contestId: problem.contestId,
+            problemIndex: problem.problemIndex,
+            languageId: LANGUAGES[language].cfId,
+            source,
+            isGym: problem.url.includes('/gym/'),
+          },
+          {
+            onProgress: ({ message }) => setState({ phase: 'submitting', message }),
+          },
+        );
 
-        if (!outcome.queued) {
-          const s = {
-            phase: 'error',
-            error: outcome.error ?? 'Submission was rejected by Codeforces.',
-          };
-          setState(s);
-          return s;
-        }
-
-        setState({ phase: 'polling' });
+        setState({ phase: 'polling', message: 'In queue — waiting for the judge…' });
         const result = await pollVerdict({
           contestId: problem.contestId,
           problemIndex: problem.problemIndex,

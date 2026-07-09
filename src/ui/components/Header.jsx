@@ -43,9 +43,7 @@ export function Header({
     ? 'Submit'
     : submissionPhase === 'submitting'
       ? 'Submitting…'
-      : submissionPhase === 'verifying'
-        ? 'Finish on CF…'
-        : 'Judging…';
+      : 'Judging…';
 
   return (
     <motion.header

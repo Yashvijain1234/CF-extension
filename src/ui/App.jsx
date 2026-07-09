@@ -224,23 +224,19 @@ export function App({ problem, hostTheme, rootEl, onClose }) {
   });
 
   const isSubmitting =
-    submission.phase === 'submitting' ||
-    submission.phase === 'verifying' ||
-    submission.phase === 'polling';
+    submission.phase === 'submitting' || submission.phase === 'polling';
 
   const bottomContent = useMemo(() => {
     switch (tab) {
       case 'result': {
         const pending =
-          submission.phase === 'submitting' ||
-          submission.phase === 'verifying' ||
-          submission.phase === 'polling';
+          submission.phase === 'submitting' || submission.phase === 'polling';
+        // Live progress text streamed from the background submission flow.
         const pendingLabel =
-          submission.phase === 'submitting'
+          submission.message ??
+          (submission.phase === 'submitting'
             ? 'Sending your submission to Codeforces…'
-            : submission.phase === 'verifying'
-              ? 'Your code and problem are pre-filled — press Submit in the Codeforces window (complete the anti-bot check if shown)…'
-              : 'In queue — waiting for the judge…';
+            : 'In queue — waiting for the judge…');
         return (
           <div className="h-full overflow-y-auto p-4">
             {submission.result ? (

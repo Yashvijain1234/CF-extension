@@ -47,14 +47,6 @@ export function getHandle() {
   return postToPage('CF_GET_HANDLE');
 }
 
-export function submitSolution(payload) {
-  return postToPage('CF_SUBMIT', payload);
-}
-
-export function submitViaPage(payload) {
-  return postToPage('CF_SUBMIT_VIA_PAGE', payload);
-}
-
 export function pollVerdict(opts) {
   const { onUpdate, ...payload } = opts;
   return postToPage('CF_POLL', payload, { onPollUpdate: onUpdate });

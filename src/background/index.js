@@ -16,6 +16,7 @@ import {
 } from '@/github/service';
 import { getUser } from '@/github/client';
 import { runCompletion } from '@/services/ai/providers';
+import { handleNativeSubmitConnect, NATIVE_SUBMIT_PORT } from './nativeSubmit';
 
 async function handle(request) {
   switch (request.type) {
@@ -73,6 +74,12 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     );
   // Return true to keep the message channel open for the async response.
   return true;
+});
+
+// Native submissions use a long-lived Port so progress updates can stream to
+// the UI and the flow can outlast one-shot message timeouts.
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === NATIVE_SUBMIT_PORT) handleNativeSubmitConnect(port);
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
